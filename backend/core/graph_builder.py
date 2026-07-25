@@ -92,7 +92,6 @@ def load_master_graph(
             cluster_id=node.get("cluster_id"),
             source_url=node.get("source_url") or "",
             why=node.get("why") or [],
-            source_url=node.get("source_url"),
         )
 
     for edge in raw_edges:

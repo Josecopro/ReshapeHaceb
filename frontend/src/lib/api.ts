@@ -1,5 +1,7 @@
-import type { DbNode, DbEdge, AgentNode, AgentEdge } from '@/types';
-import { dbNodeToAgentNode, dbEdgeToAgentEdge } from '@/types';
+import type { DbNode, DbEdge, AgentNode, AgentEdge } from '@/types/graph.types';
+import { dbNodeToAgentNode, dbEdgeToAgentEdge } from '@/types/graph.types';
+
+const BASE_URL = 'http://localhost:8000';
 
 export interface TopologyOption {
   leaf_id: string;
@@ -30,7 +32,7 @@ export interface GraphResponse {
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(path, {
+  const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -45,7 +47,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export async function fetchGraph(): Promise<{ nodes: AgentNode[]; edges: AgentEdge[] }> {
-  const data = await request<GraphResponse>('/api/proxy/graph');
+  const data = await request<GraphResponse>('/api/graph');
   return {
     nodes: data.nodes.map(dbNodeToAgentNode),
     edges: data.edges.map(dbEdgeToAgentEdge),
@@ -53,7 +55,7 @@ export async function fetchGraph(): Promise<{ nodes: AgentNode[]; edges: AgentEd
 }
 
 export async function sendChatMessage(message: string): Promise<ChatResponse> {
-  return request<ChatResponse>('/api/proxy/chat', {
+  return request<ChatResponse>('/api/chat', {
     method: 'POST',
     body: JSON.stringify({ message }),
   });

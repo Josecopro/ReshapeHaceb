@@ -19,6 +19,7 @@ from pydantic import BaseModel
 
 from config import (
     GROQ_API_KEY,
+    get_groq_api_key,
     GRAPH_DB_NODES_PATH,
     GRAPH_DB_EDGES_PATH,
     MAX_EXPLORATION_DEPTH,
@@ -27,6 +28,7 @@ from core.graph_builder import load_master_graph, build_from_extraction, graph_t
 from core.topology import evaluate_topology, TopologicalState
 from services.graph_extractor import extract_graph_from_prompt, GraphExtractionError
 from services.normalizer import normalize_and_extract_neighborhood
+from services.response_generator import generate_assistant_response
 
 app = FastAPI(title="ReshapeHck Backend", version="1.0.0")
 
@@ -35,6 +37,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -44,55 +48,6 @@ app.add_middleware(
 
 def _load_gdb() -> "nx.DiGraph":
     return load_master_graph(GRAPH_DB_NODES_PATH, GRAPH_DB_EDGES_PATH)
-
-
-def _build_assistant_message(
-    topology_result,
-    extracted_nodes: list,
-) -> str:
-    estado = topology_result.estado
-    lines = []
-
-    if estado == TopologicalState.SIN_CAMINO:
-        return (
-            "⚠️ No se encontró una ruta Procedural clara en el grafo "
-            "de conocimiento para tu consulta. Por favor reformula "
-            "tu pregunta o proporciona más detalles."
-        )
-
-    extracted_labels = [n.label for n in extracted_nodes]
-    lines.append(f"📋 **Nodos identificados en tu consulta:**")
-    for lbl in extracted_labels:
-        lines.append(f"  - {lbl}")
-
-    lines.append("")
-
-    if estado == TopologicalState.CONVERGENTE:
-        hoja = topology_result.hoja_mayoritaria
-        lines.append("✅ **Resultado: CONVERGENTE** — El análisis converge")
-        lines.append(f"en un camino principal.")
-        lines.append("")
-        lines.append(f"**Destino más probable:** _{hoja.leaf_label}_")
-        lines.append(f"  - Confianza: {hoja.ratio:.0%}")
-        lines.append(f"  - Ruta: {' → '.join(topology_result.camino_seleccionado)}")
-        if hoja.leaf_why:
-            lines.append(f"  - Síntomas asociados: {', '.join(hoja.leaf_why)}")
-        lines.append("")
-        if len(topology_result.opciones) > 1:
-            lines.append(f"*También se consideraron {len(topology_result.opciones) - 1} "
-                         f"ruta(s) alternativa(s).*")
-    else:
-        lines.append("❓ **Resultado: DIVERGENTE** — Tu consulta puede")
-        lines.append(f"llevar a múltiples caminos distintos.")
-        lines.append("")
-        lines.append("**Opciones encontradas:**")
-        for opt in topology_result.opciones:
-            lines.append(f"  - _{opt.leaf_label}_ ({opt.ratio:.0%} de las rutas)")
-        lines.append("")
-        lines.append("Para ayudarte mejor, ¿por cuál de estas opciones ")
-        lines.append("quisieras continuar?")
-
-    return "\n".join(lines)
 
 
 # ─── Endpoints ────────────────────────────────────────────────────────
@@ -125,7 +80,8 @@ class ChatResponse(BaseModel):
 
 @app.post("/api/chat")
 async def chat(req: ChatRequest):
-    if not GROQ_API_KEY:
+    api_key = get_groq_api_key() or GROQ_API_KEY
+    if not api_key:
         raise HTTPException(
             status_code=503,
             detail="GROQ_API_KEY no está configurada. El chat requiere una clave de API.",
@@ -154,10 +110,17 @@ async def chat(req: ChatRequest):
     topology_result = evaluate_topology(
         norm_result.neighborhood_subgraph,
         extracted_digraph,
+        db_digraph,
         max_depth=MAX_EXPLORATION_DEPTH,
     )
 
-    assistant_message = _build_assistant_message(topology_result, extraction.nodes)
+    assistant_message = generate_assistant_response(
+        user_message=req.message,
+        topology_result=topology_result,
+        extracted_nodes=extraction.nodes,
+        norm_result=norm_result,
+        db_graph=db_digraph,
+    )
 
     return {
         "assistant_message": assistant_message,

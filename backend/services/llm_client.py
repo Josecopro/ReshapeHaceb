@@ -12,17 +12,18 @@ from typing import Any, Optional
 
 from groq import Groq
 
-from config import GROQ_API_KEY
+from config import GROQ_API_KEY, get_groq_api_key
 
 
 @lru_cache(maxsize=1)
 def get_groq_client() -> Groq:
     """Cliente Groq singleton (cacheado por proceso)."""
-    if not GROQ_API_KEY:
+    api_key = get_groq_api_key() or GROQ_API_KEY
+    if not api_key:
         raise RuntimeError(
             "GROQ_API_KEY no está configurada. Define la variable de entorno."
         )
-    return Groq(api_key=GROQ_API_KEY)
+    return Groq(api_key=api_key)
 
 
 def call_with_json_schema(
