@@ -1,0 +1,196 @@
+{
+  "edges": [
+    {
+      "source": "identifyModel",
+      "target": "locateServiceManual",
+      "edge_type": "INFORMATIVE",
+      "cost": 1
+    },
+    {
+      "source": "locateServiceManual",
+      "target": "checkPowerSupply",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "locateServiceManual",
+      "target": "validateElectricalInput",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "checkPowerSupply",
+      "target": "diagnoseCoolingIssue",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "validateElectricalInput",
+      "target": "diagnoseCoolingIssue",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "diagnoseCoolingIssue",
+      "target": "inspectCompressor",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "diagnoseCoolingIssue",
+      "target": "checkDefrostSensor",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "diagnoseCoolingIssue",
+      "target": "inspectEvaporatorFan",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "diagnoseCoolingIssue",
+      "target": "testDoorSeal",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "inspectCompressor",
+      "target": "testCompressorWindings",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "testCompressorWindings",
+      "target": "checkRefrigerantLeak",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "checkRefrigerantLeak",
+      "target": "identifyReplacementPart",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "checkDefrostSensor",
+      "target": "testDefrostHeater",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "testDefrostHeater",
+      "target": "verifyDefrostTimer",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "verifyDefrostTimer",
+      "target": "inspectControlBoard",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "inspectControlBoard",
+      "target": "runSelfDiagnostic",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "runSelfDiagnostic",
+      "target": "readErrorCodes",
+      "edge_type": "INFORMATIVE",
+      "cost": 1
+    },
+    {
+      "source": "readErrorCodes",
+      "target": "identifyReplacementPart",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "inspectEvaporatorFan",
+      "target": "testCondenserFan",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "testCondenserFan",
+      "target": "identifyReplacementPart",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "testDoorSeal",
+      "target": "closeRepairTicket",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "identifyReplacementPart",
+      "target": "orderCompatiblePart",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "orderCompatiblePart",
+      "target": "closeRepairTicket",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "diagnoseCoolingIssue",
+      "target": "testColdControlThermostat",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "testColdControlThermostat",
+      "target": "identifyReplacementPart",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "diagnoseCoolingIssue",
+      "target": "diagnoseIcemakerFault",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "diagnoseIcemakerFault",
+      "target": "testIcemakerModule",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "testIcemakerModule",
+      "target": "identifyReplacementPart",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "inspectCompressor",
+      "target": "testStartRelayCapacitor",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "testStartRelayCapacitor",
+      "target": "checkRefrigerantLeak",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "verifyDefrostTimer",
+      "target": "inspectADCBoard",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    },
+    {
+      "source": "inspectADCBoard",
+      "target": "runSelfDiagnostic",
+      "edge_type": "PROCEDURAL",
+      "cost": 1
+    }
+  ]
+}
