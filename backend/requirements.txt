@@ -1,0 +1,6 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.34.0
+networkx>=3.4
+pydantic>=2.10
+groq>=0.18
+rapidfuzz>=3.12

@@ -1,0 +1,13 @@
+[
+  { "source": "iniciarProceso", "target": "verificarSesion", "edge_type": "PROCEDURAL", "cost": 1 },
+  { "source": "verificarSesion", "target": "consultarSaldo", "edge_type": "PROCEDURAL", "cost": 1 },
+  { "source": "verificarSesion", "target": "errorSesion", "edge_type": "PROCEDURAL", "cost": 1 },
+  { "source": "consultarSaldo", "target": "saldoCero", "edge_type": "PROCEDURAL", "cost": 1 },
+  { "source": "consultarSaldo", "target": "saldoPositivo", "edge_type": "PROCEDURAL", "cost": 1 },
+  { "source": "saldoCero", "target": "confirmarCancelacion", "edge_type": "PROCEDURAL", "cost": 1 },
+  { "source": "saldoPositivo", "target": "ofrecerPago", "edge_type": "PROCEDURAL", "cost": 1 },
+  { "source": "ofrecerPago", "target": "pagoRealizado", "edge_type": "PROCEDURAL", "cost": 1 },
+  { "source": "pagoRealizado", "target": "confirmarCancelacion", "edge_type": "PROCEDURAL", "cost": 1 },
+  { "source": "confirmarCancelacion", "target": "cancelacionExitosa", "edge_type": "PROCEDURAL", "cost": 1 },
+  { "source": "cancelacionExitosa", "target": "notificarUsuario", "edge_type": "INFORMATIVE", "cost": 1 }
+]

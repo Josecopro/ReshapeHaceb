@@ -1,0 +1,13 @@
+[
+  { "source": "iniciarProceso", "target": "verificarSesion", "tipo_relacion": "PROCEDURAL", "peso": 1.0, "condicion": "", "es_bifurcacion_critica": false },
+  { "source": "verificarSesion", "target": "consultarSaldo", "tipo_relacion": "PROCEDURAL", "peso": 1.0, "condicion": "sesion.valida === true", "es_bifurcacion_critica": false },
+  { "source": "verificarSesion", "target": "errorSesion", "tipo_relacion": "PROCEDURAL", "peso": 1.0, "condicion": "sesion.valida === false", "es_bifurcacion_critica": true },
+  { "source": "consultarSaldo", "target": "saldoCero", "tipo_relacion": "PROCEDURAL", "peso": 1.0, "condicion": "saldoPendiente === 0", "es_bifurcacion_critica": false },
+  { "source": "consultarSaldo", "target": "saldoPositivo", "tipo_relacion": "PROCEDURAL", "peso": 1.0, "condicion": "saldoPendiente > 0", "es_bifurcacion_critica": true },
+  { "source": "saldoCero", "target": "confirmarCancelacion", "tipo_relacion": "PROCEDURAL", "peso": 1.0, "condicion": "", "es_bifurcacion_critica": false },
+  { "source": "saldoPositivo", "target": "ofrecerPago", "tipo_relacion": "PROCEDURAL", "peso": 1.0, "condicion": "", "es_bifurcacion_critica": false },
+  { "source": "ofrecerPago", "target": "pagoRealizado", "tipo_relacion": "PROCEDURAL", "peso": 1.0, "condicion": "pago.completado === true", "es_bifurcacion_critica": false },
+  { "source": "pagoRealizado", "target": "confirmarCancelacion", "tipo_relacion": "PROCEDURAL", "peso": 1.0, "condicion": "", "es_bifurcacion_critica": false },
+  { "source": "confirmarCancelacion", "target": "cancelacionExitosa", "tipo_relacion": "PROCEDURAL", "peso": 1.0, "condicion": "confirmacion === true", "es_bifurcacion_critica": false },
+  { "source": "cancelacionExitosa", "target": "notificarUsuario", "tipo_relacion": "INFORMATIVA", "peso": 0.5, "condicion": "", "es_bifurcacion_critica": false }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "id": "iniciarProceso",
+    "label": "Iniciar Proceso",
+    "cluster_id": "cancelarSuscripcion"
+  },
+  {
+    "id": "verificarSesion",
+    "label": "Verificar Sesión",
+    "cluster_id": "cancelarSuscripcion"
+  },
+  {
+    "id": "consultarSaldo",
+    "label": "Consultar Saldo Pendiente",
+    "cluster_id": "cancelarSuscripcion"
+  },
+  {
+    "id": "saldoCero",
+    "label": "Saldo Pendiente = 0",
+    "cluster_id": "cancelarSuscripcion"
+  },
+  {
+    "id": "saldoPositivo",
+    "label": "Saldo Pendiente > 0",
+    "cluster_id": "cancelarSuscripcion"
+  },
+  {
+    "id": "ofrecerPago",
+    "label": "Ofrecer Opciones de Pago",
+    "cluster_id": "cancelarSuscripcion"
+  },
+  {
+    "id": "pagoRealizado",
+    "label": "Pago Realizado Exitosamente",
+    "cluster_id": "cancelarSuscripcion"
+  },
+  {
+    "id": "confirmarCancelacion",
+    "label": "Confirmar Cancelación",
+    "cluster_id": "cancelarSuscripcion"
+  },
+  {
+    "id": "cancelacionExitosa",
+    "label": "Cancelación Exitosa",
+    "cluster_id": "cancelarSuscripcion"
+  },
+  {
+    "id": "notificarUsuario",
+    "label": "Notificar al Usuario",
+    "cluster_id": "cancelarSuscripcion"
+  },
+  {
+    "id": "errorSesion",
+    "label": "Error de Sesión",
+    "cluster_id": "cancelarSuscripcion"
+  }
+]
