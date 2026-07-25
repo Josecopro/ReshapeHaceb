@@ -54,9 +54,27 @@ export async function fetchGraph(): Promise<{ nodes: AgentNode[]; edges: AgentEd
   };
 }
 
+export interface NodeReasoningResponse {
+  node_id: string;
+  label: string;
+  reasoning: string;
+  why: string[];
+  source_url?: string;
+  predecessors: string[];
+  successors: string[];
+}
+
+export async function fetchNodeReasoning(nodeId: string, userContext?: string): Promise<NodeReasoningResponse> {
+  return request<NodeReasoningResponse>('/api/node-reasoning', {
+    method: 'POST',
+    body: JSON.stringify({ node_id: nodeId, user_context: userContext }),
+  });
+}
+
 export async function sendChatMessage(message: string): Promise<ChatResponse> {
   return request<ChatResponse>('/api/chat', {
     method: 'POST',
     body: JSON.stringify({ message }),
   });
 }
+

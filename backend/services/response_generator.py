@@ -5,7 +5,8 @@ Generación de respuestas del asistente adaptativas e interactivas.
 Cuando la evaluación topológica devuelve SIN_CAMINO (o DIVERGENTE),
 utiliza el LLM de Groq (o una estrategia estructurada con fallback)
 para contrapreguntar al usuario/técnico con preguntas de aclaración
-diagnósticas precisas en lugar de un mensaje estático de error.
+diagnósticas precisas en lenguaje natural accesible, sin exponer bloques
+JSON al usuario.
 """
 
 from typing import Any
@@ -24,9 +25,8 @@ def generate_assistant_response(
     db_graph: nx.DiGraph,
 ) -> str:
     """
-    Construye la respuesta final del asistente.
-    Para CONVERGENTE / DIVERGENTE, formatea la salida estructurada.
-    Para SIN_CAMINO, genera contrapreguntas diagnósticas específicas.
+    Construye la respuesta final del asistente limpia en Markdown.
+    No incluye bloques ```json en el mensaje de salida.
     """
     estado = topology_result.estado
     extracted_labels = [getattr(n, "label", str(n)) for n in extracted_nodes]
@@ -81,16 +81,18 @@ def _generate_sin_camino_response(
     db_graph: nx.DiGraph,
 ) -> str:
     """
-    Genera contrapreguntas para guiar al usuario cuando no hay un camino directo en G_db.
+    Genera contrapreguntas en lenguaje natural limpio sin JSON.
     """
     api_key = get_groq_api_key() or GROQ_API_KEY
     if api_key:
         try:
             llm_text = _call_llm_for_clarification(user_message, extracted_labels, db_graph)
             if llm_text and len(llm_text.strip()) > 30:
-                return llm_text
+                # Limpiar cualquier bloque json accidental si el modelo lo generara
+                cleaned = llm_text.split("```json")[0].strip()
+                return cleaned if cleaned else llm_text
         except Exception:
-            pass  # Fallback a plantilla determinista abajo
+            pass  # Fallback determinista abajo
 
     return _build_fallback_clarification(user_message, extracted_labels, matches, db_graph)
 
@@ -102,33 +104,30 @@ def _call_llm_for_clarification(
 ) -> str:
     client = get_groq_client()
 
-    sample_nodes = []
+    nodes_info = []
     for node_id, data in db_graph.nodes(data=True):
         label = data.get("label", node_id)
         why = data.get("why") or []
-        why_str = f" ({', '.join(why[:2])})" if why else ""
-        sample_nodes.append(f"- {label}{why_str}")
+        why_str = f" [Síntomas/Whys: {'; '.join(why)}]" if why else ""
+        nodes_info.append(f"- ID: '{node_id}' | Label: '{label}'{why_str}")
 
-    context_str = "\n".join(sample_nodes[:15])
+    nodes_context = "\n".join(nodes_info)
 
     system_prompt = (
-        "Eres un asistente de soporte técnico experto en electrodomésticos y refrigeradores Haceb. "
-        "Tu objetivo es ayudar al técnico a diagnosticar una falla cuando la consulta inicial "
-        "no es lo suficientemente específica para seguir una ruta procedimental exacta en la base de conocimiento.\n\n"
-        "REGLAS:\n"
-        "1. Inicia reconociendo amablemente los detalles que el usuario proporcionó.\n"
-        "2. Explica de forma concisa que se necesitan más detalles específicos para trazar la ruta de solución ideal.\n"
-        "3. Formula exactamente entre 3 y 4 CONTRAPREGUNTAS diagnósticas muy concretas, técnicas y relevantes "
-        "(ej. ruidos/clics del compresor, funcionamiento de ventiladores, presencia de escarcha/hielo, códigos de error en display, etc.).\n"
-        "4. Usa formato Markdown limpio con viñetas o números para que las preguntas sean claras y destacadas.\n"
-        "5. Sé profesional y mantén un excelente tono de servicio técnico."
+        "Eres un asistente de soporte técnico experto en electrodomésticos Haceb.\n"
+        "Tu tarea es generar contrapreguntas de aclaración en lenguaje natural fluido y Markdown limpio cuando la consulta inicial "
+        "no contiene información suficiente para trazar una ruta procedimental única en el grafo de conocimiento.\n\n"
+        "REGLAS OBLIGATORIAS:\n"
+        "1. Inicia reconociendo los detalles que el usuario proporcionó.\n"
+        "2. Formula entre 3 y 4 CONTRAPREGUNTAS diagnósticas concretas basándote en los síntomas ('whys') y nodos de G_db.\n"
+        "3. NO incluyas código JSON, ni bloques de código ```json, ni explicaciones técnicas internas en la respuesta. Debe ser puramente texto y viñetas en Markdown limpio."
     )
 
     user_prompt = (
         f"Consulta del usuario: \"{user_message}\"\n"
-        f"Conceptos o síntomas identificados: {extracted_labels if extracted_labels else 'Ninguno específico'}\n\n"
-        f"Procedimientos/Diagnósticos disponibles en la base de conocimiento:\n{context_str}\n\n"
-        "Genera una respuesta con contrapreguntas oportunas y claras para este caso."
+        f"Síntomas/Conceptos identificados: {extracted_labels if extracted_labels else 'No especificado'}\n\n"
+        f"Nodos canónicos de G_db (ID, Label y Whys asociados):\n{nodes_context}\n\n"
+        "Genera únicamente la respuesta con las contrapreguntas en Markdown sin ningún bloque JSON."
     )
 
     completion = client.chat.completions.create(
@@ -137,7 +136,7 @@ def _call_llm_for_clarification(
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        temperature=0.3,
+        temperature=0.2,
         max_tokens=600,
     )
     return completion.choices[0].message.content
@@ -165,7 +164,5 @@ def _build_fallback_clarification(
     lines.append("2. ❄️ **Estado de enfriamiento**: ¿El congelador enfría mientras la parte inferior (conservador) no enfría, o ambos compartimentos están tibios?")
     lines.append("3. 💨 **Ventiladores e higiene térmica**: ¿Se escucha el ventilador interno del evaporador o el ventilador trasero del condensador?")
     lines.append("4. 🖥️ **Códigos de error**: ¿El panel de control muestra algún código de error o patrón de luces parpadeantes?")
-    lines.append("")
-    lines.append("Con tu respuesta identificaremos la ruta precisa en el grafo de conocimiento.")
 
     return "\n".join(lines)

@@ -64,28 +64,36 @@ def _match_single_node(
     threshold: int,
 ) -> NodeMatch:
     """
-    Intenta matchear primero por id (más barato y más preciso cuando el SLM
-    acierta el formato canónico), y si no supera el umbral, cae a matchear
-    por label (más tolerante a que el SLM haya usado otras palabras).
+    Prioridad de matching:
+    1. 'why': Compara el label extraído contra la lista de 'why' (síntomas/razones)
+       de cada nodo en G_db. Es la fuente más rica en lenguaje natural.
+    2. 'label': Compara contra los labels canónicos de los nodos.
+    3. 'id': Compara contra los ids canónicos de los nodos.
     """
-    db_ids = list(db_graph.nodes)
+    best_why_match = None
+    best_why_score = 0.0
+
+    # 1. Matching por lista de 'why' (síntomas de G_db)
+    for node_id, data in db_graph.nodes(data=True):
+        why_list = data.get("why") or []
+        for why_item in why_list:
+            if not why_item:
+                continue
+            score = fuzz.WRatio(extracted_label, why_item)
+            if score > best_why_score:
+                best_why_score = score
+                best_why_match = node_id
+
+    if best_why_score >= threshold and best_why_match:
+        return NodeMatch(
+            extracted_id=extracted_id,
+            matched_id=best_why_match,
+            score=best_why_score,
+            matched_by="why",
+        )
+
+    # 2. Matching por label
     db_labels = {n: data.get("label", n) for n, data in db_graph.nodes(data=True)}
-
-    # 1. Intento por id
-    id_result = process.extractOne(
-        extracted_id, db_ids, scorer=fuzz.WRatio
-    )
-    if id_result is not None:
-        matched_id, score, _ = id_result
-        if score >= threshold:
-            return NodeMatch(
-                extracted_id=extracted_id,
-                matched_id=matched_id,
-                score=score,
-                matched_by="id",
-            )
-
-    # 2. Intento por label
     label_result = process.extractOne(
         extracted_label, db_labels, scorer=fuzz.WRatio
     )
@@ -99,10 +107,26 @@ def _match_single_node(
                 matched_by="label",
             )
 
-    # 3. Sin match aceptable
+    # 3. Matching por id
+    db_ids = list(db_graph.nodes)
+    id_result = process.extractOne(
+        extracted_id, db_ids, scorer=fuzz.WRatio
+    )
+    if id_result is not None:
+        matched_id, score, _ = id_result
+        if score >= threshold:
+            return NodeMatch(
+                extracted_id=extracted_id,
+                matched_id=matched_id,
+                score=score,
+                matched_by="id",
+            )
+
+    # Sin match aceptable
     best_score = max(
-        id_result[1] if id_result else 0,
+        best_why_score,
         label_result[1] if label_result else 0,
+        id_result[1] if id_result else 0,
     )
     return NodeMatch(
         extracted_id=extracted_id,

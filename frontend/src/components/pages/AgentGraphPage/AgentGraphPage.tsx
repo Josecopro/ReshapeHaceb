@@ -9,7 +9,7 @@ import type { ThemeName } from '@/constants/edgeConfig';
 import { Badge } from '@/components/atoms';
 import { Toolbar, Legend, FloatingModal, ChatSidebar, ThemeTransition } from '@/components/organisms';
 import { GraphViewTemplate } from '@/components/templates';
-import { fetchGraph, sendChatMessage } from '@/lib/api';
+import { fetchGraph, sendChatMessage, fetchNodeReasoning } from '@/lib/api';
 import type { TopologyResult } from '@/lib/api';
 
 const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), {
@@ -19,18 +19,8 @@ const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), {
 const WELCOME_MSG: ChatMessageData = {
   id: 'welcome',
   role: 'system',
-  text: '👋 Bienvenido al asistente de reparación Haceb. Describe el problema técnico que presenta el refrigerador para que el sistema analice el flujo de diagnóstico.',
+  text: '👋 Bienvenido al asistente de reparación Haceb. Haz clic en cualquier nodo para ver su modelo de pensamiento (razonamiento causal) o escribe tu consulta.',
   timestamp: Date.now(),
-};
-
-const generateAssistantResponse = (node: AgentNode): string => {
-  if (node.tipo === 'ACCION') {
-    return `**Acción:** "${node.label}"\n\n${node.definicion}`;
-  }
-  if (node.tipo === 'ESTADO') {
-    return `**Estado evaluado:** "${node.label}"\n\n${node.definicion}`;
-  }
-  return `**Información:** "${node.label}"\n\n${node.definicion}`;
 };
 
 const getBadgeVariant = (tipo: string): 'accion' | 'estado' | 'default' => {
@@ -46,6 +36,7 @@ const AgentGraphPage = () => {
   const [transitionColor, setTransitionColor] = useState<string | null>(null);
   const [showProceduralOnly, setShowProceduralOnly] = useState(false);
   const [selectedNode, setSelectedNode] = useState<AgentNode | null>(null);
+  const [nodeReasoningText, setNodeReasoningText] = useState<string | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessageData[]>([WELCOME_MSG]);
   const [chatLoading, setChatLoading] = useState(false);
@@ -133,33 +124,38 @@ const AgentGraphPage = () => {
     return getEdgeWidth(link);
   }, [hasHighlights]);
 
-  const handleNodeClick = useCallback((node: any) => {
+  const handleNodeClick = useCallback(async (node: any) => {
     const agentNode: AgentNode = {
       id: node.id, label: node.label, tipo: node.tipo,
       definicion: node.definicion, agrupador_canonico: node.agrupador_canonico,
+      why: node.why, source_url: node.source_url,
     };
 
     setSelectedNode(agentNode);
+    setNodeReasoningText(null);
 
     const sysMsg: ChatMessageData = {
       id: `sys-${Date.now()}`,
       role: 'system',
-      text: `🔍 Nodo seleccionado: ${agentNode.label} (${agentNode.tipo})  \n\`${agentNode.id}\``,
+      text: `🔍 Nodo seleccionado: **${agentNode.label}** (\`${agentNode.id}\`)`,
       timestamp: Date.now(),
     };
-
-    const assistMsg: ChatMessageData = {
-      id: `ai-${Date.now()}`,
-      role: 'assistant',
-      text: generateAssistantResponse(agentNode),
-      timestamp: Date.now() + 1,
-    };
-
     setMessages(prev => [...prev, sysMsg]);
 
-    setTimeout(() => {
+    try {
+      const reasoningData = await fetchNodeReasoning(agentNode.id);
+      setNodeReasoningText(reasoningData.reasoning);
+
+      const assistMsg: ChatMessageData = {
+        id: `ai-${Date.now()}`,
+        role: 'assistant',
+        text: reasoningData.reasoning,
+        timestamp: Date.now() + 1,
+      };
       setMessages(prev => [...prev, assistMsg]);
-    }, 800);
+    } catch (err: any) {
+      console.error('Error al obtener razonamiento del nodo:', err);
+    }
   }, []);
 
   const handleBackgroundClick = useCallback(() => setSelectedNode(null), []);
@@ -189,9 +185,9 @@ const AgentGraphPage = () => {
     try {
       const response = await sendChatMessage(fullText);
 
-      const neighborhoodIds = new Set(response.neighborhood_graph.nodes.map(n => n.id));
-      const edgeKeys = new Set(
-        response.neighborhood_graph.edges.map(e => `${e.source}->${e.target}`)
+      const neighborhoodIds = new Set<string>(response.neighborhood_graph.nodes.map((n: any) => n.id as string));
+      const edgeKeys = new Set<string>(
+        response.neighborhood_graph.edges.map((e: any) => `${e.source}->${e.target}`)
       );
       setHighlightedNodeIds(neighborhoodIds);
       setHighlightedEdgeKeys(edgeKeys);
@@ -207,7 +203,7 @@ const AgentGraphPage = () => {
 
       if (response.topology.estado === 'DIVERGENTE') {
         const optionsText = response.topology.opciones
-          .map((o, i) => `${i + 1}. **${o.leaf_label}** (${(o.ratio * 100).toFixed(0)}%)`)
+          .map((o: any, i: number) => `${i + 1}. **${o.leaf_label}** (${(o.ratio * 100).toFixed(0)}%)`)
           .join('\n');
         const optionMsg: ChatMessageData = {
           id: `opt-${Date.now()}`,
@@ -242,7 +238,7 @@ const AgentGraphPage = () => {
 
   const modalFields = selectedNode ? [
     { label: 'Tipo', value: <Badge variant={getBadgeVariant(selectedNode.tipo)}>{selectedNode.tipo}</Badge> },
-    { label: 'Definición (CoT)', value: selectedNode.definicion },
+    { label: 'Modelo de Pensamiento (CoT)', value: nodeReasoningText || selectedNode.definicion || 'Cargando modelo de pensamiento...' },
     { label: 'Agrupador Canónico', value: selectedNode.agrupador_canonico },
   ] : [];
 
