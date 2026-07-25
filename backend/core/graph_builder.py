@@ -31,12 +31,22 @@ def load_master_graph(
     edges_path: str | Path,
 ) -> nx.DiGraph:
     """
-    Carga el grafo maestro G_db desde dos archivos JSON locales:
+    Carga el grafo maestro G_db desde dos archivos JSON locales.
 
-    nodes.json -> lista de objetos:
-        {"id": str, "label": str, "cluster_id": str}
+    Soporta dos formas de nodes.json:
+      - lista pelada: [{"id": ..., "label": ..., "cluster_id": ...}, ...]
+      - envuelto: {"graph_metadata": {...}, "nodes": [...]}
 
-    edges.json -> lista de objetos:
+    Y dos formas de edges.json:
+      - lista pelada: [{"source": ..., "target": ..., ...}, ...]
+      - envuelto: {"edges": [...]}
+
+    Node schema esperado (campos extra se preservan como atributos del
+    nodo sin romper el pipeline, ej. "source_url"):
+        {"id": str, "label": str, "cluster_id": str, "why": [str, ...],
+         "source_url": str (opcional)}
+
+    Edge schema esperado:
         {"source": str, "target": str, "edge_type": "PROCEDURAL"|"INFORMATIVE", "cost": 1}
 
     Lanza ValueError si una arista referencia un nodo inexistente, o si hay
@@ -47,9 +57,21 @@ def load_master_graph(
     edges_path = Path(edges_path)
 
     with nodes_path.open("r", encoding="utf-8") as f:
-        raw_nodes = json.load(f)
+        raw_nodes_content = json.load(f)
     with edges_path.open("r", encoding="utf-8") as f:
-        raw_edges = json.load(f)
+        raw_edges_content = json.load(f)
+
+    # Desenvolver si viene con envoltorio {"nodes": [...]} / {"edges": [...]}
+    raw_nodes = (
+        raw_nodes_content["nodes"]
+        if isinstance(raw_nodes_content, dict)
+        else raw_nodes_content
+    )
+    raw_edges = (
+        raw_edges_content["edges"]
+        if isinstance(raw_edges_content, dict)
+        else raw_edges_content
+    )
 
     graph = nx.DiGraph()
 
@@ -64,6 +86,7 @@ def load_master_graph(
             label=node["label"],
             cluster_id=node.get("cluster_id"),
             why=node.get("why") or [],
+            source_url=node.get("source_url"),
         )
 
     for edge in raw_edges:

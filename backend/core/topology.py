@@ -108,20 +108,35 @@ def _procedural_view(graph: nx.DiGraph) -> nx.DiGraph:
     return view
 
 
-def _is_leaf(proc_view: nx.DiGraph, node: str) -> bool:
-    """Una hoja es un nodo sin sucesores PROCEDURAL."""
-    return proc_view.out_degree(node) == 0
+def _is_leaf(full_db_procedural_view: nx.DiGraph, node: str) -> bool:
+    """
+    Una hoja es un nodo sin sucesores PROCEDURAL, evaluado contra el grafo
+    maestro COMPLETO (no contra la vecindad recortada por normalizer.py).
+
+    Esto es crítico: si evaluáramos "hoja" solo dentro de la vecindad
+    acotada, un nodo intermedio que en realidad tiene más pasos después
+    (pero esos pasos cayeron fuera de la vecindad K-hop) se confundiría
+    con un final de proceso real, y rutas cortas-pero-truncadas le
+    ganarían en la poda a rutas más largas pero verdaderamente completas.
+    """
+    if node not in full_db_procedural_view:
+        # Nodo fuera de G_db (no debería pasar tras el matching, pero por
+        # seguridad lo tratamos como hoja para no romper la búsqueda).
+        return True
+    return full_db_procedural_view.out_degree(node) == 0
 
 
 def find_all_procedural_paths(
     neighborhood_graph: nx.DiGraph,
     origin: str,
+    full_db_graph: nx.DiGraph,
     max_depth: int = MAX_EXPLORATION_DEPTH,
 ) -> list[list[str]]:
     """
     Encuentra todos los caminos simples PROCEDURAL desde `origin` hasta
-    cualquier hoja alcanzable (nodo sin sucesores PROCEDURAL) dentro de
-    `neighborhood_graph`, respetando D_max como cutoff.
+    cualquier hoja alcanzable DENTRO de `neighborhood_graph` (la vecindad
+    ya acotada), pero usando `full_db_graph` (G_db completo) para decidir
+    qué nodos son realmente hojas -- ver _is_leaf().
     """
     if origin not in neighborhood_graph:
         return []
@@ -130,7 +145,8 @@ def find_all_procedural_paths(
     if origin not in proc_view:
         return []
 
-    leaf_nodes = [n for n in proc_view.nodes if _is_leaf(proc_view, n)]
+    full_proc_view = _procedural_view(full_db_graph)
+    leaf_nodes = [n for n in proc_view.nodes if _is_leaf(full_proc_view, n)]
 
     all_paths: list[list[str]] = []
     for target in leaf_nodes:
@@ -160,6 +176,7 @@ def prune_shortest_paths(
 def evaluate_topology(
     neighborhood_graph: nx.DiGraph,
     extracted_graph: nx.DiGraph,
+    db_graph: nx.DiGraph,
     max_depth: int = MAX_EXPLORATION_DEPTH,
     max_pruned_paths: int = MAX_PRUNED_PATHS,
     convergence_threshold: float = CONVERGENCE_THRESHOLD,
@@ -170,12 +187,16 @@ def evaluate_topology(
     neighborhood_graph: fragmento de G_db ya acotado (normalizer.py), los
         nodos deben traer 'label', 'cluster_id' y 'why' (lista de str).
     extracted_graph: G_extraido crudo (para determinar el nodo origen).
+    db_graph: G_db COMPLETO (para decidir qué nodos son hojas reales,
+        independiente de qué tanto recortó la vecindad K-hop).
     """
     origin = find_origin_node(extracted_graph)
     if origin is None or origin not in neighborhood_graph:
         return TopologyResult(estado=TopologicalState.SIN_CAMINO, origen=origin)
 
-    all_paths = find_all_procedural_paths(neighborhood_graph, origin, max_depth)
+    all_paths = find_all_procedural_paths(
+        neighborhood_graph, origin, db_graph, max_depth
+    )
     if not all_paths:
         return TopologyResult(estado=TopologicalState.SIN_CAMINO, origen=origin)
 

@@ -27,8 +27,8 @@ from dataclasses import dataclass, field
 import networkx as nx
 from rapidfuzz import fuzz, process
 
-DEFAULT_FUZZY_THRESHOLD = 70
-DEFAULT_NEIGHBORHOOD_HOPS = 2
+DEFAULT_FUZZY_THRESHOLD = 60
+DEFAULT_NEIGHBORHOOD_HOPS = 4
 
 
 @dataclass
