@@ -2,159 +2,247 @@
   "graph_metadata": {
     "domain": "Reparación técnica de refrigeradores/neveras (soporte a técnico, no a usuario final)",
     "node_count": 25,
-    "schema_extension": "Cada nodo añade el campo 'source_url' sin romper el esquema base (id, label, cluster_id).",
-    "update_note": "Ampliación v2: se agregaron 5 nodos (termostato/control de frío, relé-capacitor de arranque, tarjeta ADC de deshielo, y dos nodos de fabricador de hielo) más sus aristas, sin modificar los 20 nodos ni las aristas previas. El link de Google Books (id cjt2KdeeEaoC) proporcionado por el usuario no pudo usarse como fuente: Google bloquea el acceso automatizado (robots.txt) a esa vista previa, y el mismo ID de libro aparece reutilizado en páginas de SEO no relacionadas (p. ej. reparación de congeladores comerciales en Long Island) con distintos parámetros dq/sig, un patrón típico de enlaces de relleno/spam más que de una referencia bibliográfica estable. Los nodos nuevos se fundamentan en fuentes técnicas reales y verificadas sobre los mismos temas (termostato, capacitor de arranque, fabricador de hielo)."
+    "schema_extension": "Cada nodo añade 'source_url' (evidencia técnica) y 'why' (lista de síntomas/razones reportados por el usuario que llevan a este nodo), sin romper el esquema base (id, label, cluster_id).",
+    "update_note": "Ampliación v2: se agregaron 5 nodos (termostato/control de frío, relé-capacitor de arranque, tarjeta ADC de deshielo, y dos nodos de fabricador de hielo) más sus aristas, sin modificar los 20 nodos ni las aristas previas. El link de Google Books (id cjt2KdeeEaoC) proporcionado por el usuario no pudo usarse como fuente: Google bloquea el acceso automatizado (robots.txt) a esa vista previa, y el mismo ID de libro aparece reutilizado en páginas de SEO no relacionadas (p. ej. reparación de congeladores comerciales en Long Island) con distintos parámetros dq/sig, un patrón típico de enlaces de relleno/spam más que de una referencia bibliográfica estable. Los nodos nuevos se fundamentan en fuentes técnicas reales y verificadas sobre los mismos temas (termostato, capacitor de arranque, fabricador de hielo). Ampliación v3: se agregó el campo 'why' (array de síntomas) a cada uno de los 25 nodos, para mapear el lenguaje natural del usuario final a la ruta técnica del grafo."
   },
   "nodes": [
     {
       "id": "identifyModel",
       "label": "Identificar modelo y línea del refrigerador",
       "cluster_id": "identification",
-      "source_url": "https://adjuntos.yoreparo.com/default/0006/34/32618867a98440dd540301744053d8d6575ed308.pdf"
+      "source_url": "https://adjuntos.yoreparo.com/default/0006/34/32618867a98440dd540301744053d8d6575ed308.pdf",
+      "why": [
+        "Punto de partida obligatorio: no se conoce el modelo/línea exacta antes de diagnosticar cualquier síntoma."
+      ]
     },
     {
       "id": "locateServiceManual",
       "label": "Localizar manual de servicio específico del modelo",
       "cluster_id": "documentation",
-      "source_url": "https://www.clubdediagramas.com/archivo/refrigeracin-heladeras-neveras-congeladores-a424/general-electric-m2592"
+      "source_url": "https://www.clubdediagramas.com/archivo/refrigeracin-heladeras-neveras-congeladores-a424/general-electric-m2592",
+      "why": [
+        "Se necesita el diagrama o manual específico del modelo para interpretar cualquier síntoma reportado."
+      ]
     },
     {
       "id": "checkPowerSupply",
       "label": "Verificar alimentación eléctrica de entrada",
       "cluster_id": "power",
-      "source_url": "https://refrilavadoras.com/descargas/recursos/nevera-whirlpool.pdf"
+      "source_url": "https://refrilavadoras.com/descargas/recursos/nevera-whirlpool.pdf",
+      "why": [
+        "La nevera no enciende / no da ninguna señal de vida.",
+        "No hay luz interior ni sonido alguno al conectarla."
+      ]
     },
     {
       "id": "validateElectricalInput",
       "label": "Validar voltaje y continuidad de línea",
       "cluster_id": "power",
-      "source_url": "https://refrilavadoras.com/descargas/recursos/nevera-whirlpool.pdf"
+      "source_url": "https://refrilavadoras.com/descargas/recursos/nevera-whirlpool.pdf",
+      "why": [
+        "La nevera enciende de forma intermitente o se apaga sola.",
+        "Se sospecha bajo voltaje, falso contacto o falla en el toma/cable de línea."
+      ]
     },
     {
       "id": "diagnoseCoolingIssue",
       "label": "Diagnosticar falla de enfriamiento",
       "cluster_id": "diagnosis",
-      "source_url": "https://adjuntos.yoreparo.com/default/0006/34/32618867a98440dd540301744053d8d6575ed308.pdf"
+      "source_url": "https://adjuntos.yoreparo.com/default/0006/34/32618867a98440dd540301744053d8d6575ed308.pdf",
+      "why": [
+        "La nevera enciende y el compresor suena, pero no enfría o enfría poco.",
+        "El síntoma reportado es ambiguo y puede originarse en varios componentes distintos."
+      ]
     },
     {
       "id": "inspectCompressor",
       "label": "Inspeccionar motocompresor",
       "cluster_id": "compressor",
-      "source_url": "https://www.clubdediagramas.com/archivo/refrigeracin-heladeras-neveras-congeladores-a424/general-electric-m2592"
+      "source_url": "https://www.clubdediagramas.com/archivo/refrigeracin-heladeras-neveras-congeladores-a424/general-electric-m2592",
+      "why": [
+        "El compresor no arranca.",
+        "Se escucha zumbido o vibración sin que el motor llegue a arrancar."
+      ]
     },
     {
       "id": "testCompressorWindings",
       "label": "Probar devanados del compresor (relé, protector, bobinas)",
       "cluster_id": "compressor",
-      "source_url": "https://www.clubdediagramas.com/archivo/refrigeracin-heladeras-neveras-congeladores-a424/general-electric-m2592"
+      "source_url": "https://www.clubdediagramas.com/archivo/refrigeracin-heladeras-neveras-congeladores-a424/general-electric-m2592",
+      "why": [
+        "El compresor no arranca y se sospecha bobina de arranque/marcha o protector térmico dañado."
+      ]
     },
     {
       "id": "checkRefrigerantLeak",
       "label": "Verificar fuga de refrigerante en sistema sellado",
       "cluster_id": "sealed_system",
-      "source_url": "https://www.clubdediagramas.com/archivo/refrigeracin-heladeras-neveras-congeladores-a424/general-electric-m2592"
+      "source_url": "https://www.clubdediagramas.com/archivo/refrigeracin-heladeras-neveras-congeladores-a424/general-electric-m2592",
+      "why": [
+        "El compresor funciona con normalidad pero la nevera sigue sin enfriar.",
+        "Se sospecha fuga de refrigerante o tubo capilar/filtro obstruido."
+      ]
     },
     {
       "id": "checkDefrostSensor",
       "label": "Revisar sensor/bimetal de deshielo",
       "cluster_id": "defrost",
-      "source_url": "https://adjuntos.yoreparo.com/default/0006/34/32618867a98440dd540301744053d8d6575ed308.pdf"
+      "source_url": "https://adjuntos.yoreparo.com/default/0006/34/32618867a98440dd540301744053d8d6575ed308.pdf",
+      "why": [
+        "Se acumula hielo en exceso en el evaporador.",
+        "La nevera enfría cada vez menos con el paso de los días."
+      ]
     },
     {
       "id": "testDefrostHeater",
       "label": "Probar resistencia de deshielo (corriente y valor óhmico)",
       "cluster_id": "defrost",
-      "source_url": "https://adjuntos.yoreparo.com/default/0006/34/32618867a98440dd540301744053d8d6575ed308.pdf"
+      "source_url": "https://adjuntos.yoreparo.com/default/0006/34/32618867a98440dd540301744053d8d6575ed308.pdf",
+      "why": [
+        "Hay hielo excesivo y el ciclo de deshielo no parece activarse nunca."
+      ]
     },
     {
       "id": "verifyDefrostTimer",
       "label": "Verificar temporizador/lógica de ciclo de deshielo",
       "cluster_id": "defrost",
-      "source_url": "https://adjuntos.yoreparo.com/default/0006/34/32618867a98440dd540301744053d8d6575ed308.pdf"
+      "source_url": "https://adjuntos.yoreparo.com/default/0006/34/32618867a98440dd540301744053d8d6575ed308.pdf",
+      "why": [
+        "El ciclo de deshielo no se activa en los intervalos esperados aunque el sensor y la resistencia miden bien."
+      ]
     },
     {
       "id": "inspectControlBoard",
       "label": "Inspeccionar tarjeta de control electrónico",
       "cluster_id": "electronics",
-      "source_url": "https://www.clubdediagramas.com/"
+      "source_url": "https://www.clubdediagramas.com/",
+      "why": [
+        "Hay fallas intermitentes que no se explican por sensores ni componentes mecánicos.",
+        "Se sospecha daño en la tarjeta de control electrónico."
+      ]
     },
     {
       "id": "runSelfDiagnostic",
       "label": "Ejecutar modo de autodiagnóstico/forzado",
       "cluster_id": "electronics",
-      "source_url": "https://www.clubdediagramas.com/"
+      "source_url": "https://www.clubdediagramas.com/",
+      "why": [
+        "Se necesita confirmar el estado de sensores y actuadores mediante el modo de prueba/forzado de fábrica."
+      ]
     },
     {
       "id": "readErrorCodes",
       "label": "Leer e interpretar códigos de error",
       "cluster_id": "electronics",
-      "source_url": "https://www.clubdediagramas.com/"
+      "source_url": "https://www.clubdediagramas.com/",
+      "why": [
+        "El panel de control muestra un código de error o un patrón de luces/parpadeos."
+      ]
     },
     {
       "id": "inspectEvaporatorFan",
       "label": "Inspeccionar ventilador del evaporador",
       "cluster_id": "ventilation",
-      "source_url": "https://www.clubdediagramas.com/archivo/refrigeracin-heladeras-neveras-congeladores-a424/general-electric-m2592"
+      "source_url": "https://www.clubdediagramas.com/archivo/refrigeracin-heladeras-neveras-congeladores-a424/general-electric-m2592",
+      "why": [
+        "Hay frío desigual entre compartimentos (uno enfría, otro no).",
+        "No se escucha el ventilador interno funcionando."
+      ]
     },
     {
       "id": "testCondenserFan",
       "label": "Probar ventilador del condensador",
       "cluster_id": "ventilation",
-      "source_url": "https://www.clubdediagramas.com/archivo/refrigeracin-heladeras-neveras-congeladores-a424/general-electric-m2592"
+      "source_url": "https://www.clubdediagramas.com/archivo/refrigeracin-heladeras-neveras-congeladores-a424/general-electric-m2592",
+      "why": [
+        "El compresor trabaja mucho tiempo sin lograr la temperatura, con la parte trasera muy caliente.",
+        "Se sospecha mala disipación de calor por ventilador de condensador."
+      ]
     },
     {
       "id": "testDoorSeal",
       "label": "Probar sistema de cierre/sensor magnético de puerta",
       "cluster_id": "mechanical",
-      "source_url": "https://adjuntos.yoreparo.com/default/0006/34/32618867a98440dd540301744053d8d6575ed308.pdf"
+      "source_url": "https://adjuntos.yoreparo.com/default/0006/34/32618867a98440dd540301744053d8d6575ed308.pdf",
+      "why": [
+        "Se forma escarcha, condensación o gotas alrededor del marco de la puerta.",
+        "La nevera no logra temperatura y se sospecha fuga de frío por mal sellado de puerta."
+      ]
     },
     {
       "id": "identifyReplacementPart",
       "label": "Identificar repuesto o módulo probable a reemplazar",
       "cluster_id": "parts",
-      "source_url": "https://www.clubdediagramas.com/"
+      "source_url": "https://www.clubdediagramas.com/",
+      "why": [
+        "Ya se aisló el componente defectuoso y se requiere definir el repuesto exacto a reemplazar."
+      ]
     },
     {
       "id": "orderCompatiblePart",
       "label": "Confirmar repuesto compatible/equivalente",
       "cluster_id": "parts",
-      "source_url": "https://www.clubdediagramas.com/"
+      "source_url": "https://www.clubdediagramas.com/",
+      "why": [
+        "Se necesita confirmar equivalencia/compatibilidad del repuesto antes de instalar el reemplazo."
+      ]
     },
     {
       "id": "closeRepairTicket",
       "label": "Cerrar orden de reparación",
       "cluster_id": "closure",
-      "source_url": "https://www.clubdediagramas.com/"
+      "source_url": "https://www.clubdediagramas.com/",
+      "why": [
+        "El síntoma reportado por el usuario fue resuelto y verificado tras el reemplazo o ajuste."
+      ]
     },
     {
       "id": "testColdControlThermostat",
       "label": "Probar termostato / control de frío",
       "cluster_id": "thermostat",
-      "source_url": "https://www.yoreparo.com/es/refrigeracion/refrigeradores/preguntas/604573/termostato-de-nevera-no-frost-congela-abajo"
+      "source_url": "https://www.yoreparo.com/es/refrigeracion/refrigeradores/preguntas/604573/termostato-de-nevera-no-frost-congela-abajo",
+      "why": [
+        "La temperatura interna es inconsistente o el compresor no corta nunca.",
+        "Un compartimento congela demasiado (verduras dañadas) o no enfría lo suficiente."
+      ]
     },
     {
       "id": "testStartRelayCapacitor",
       "label": "Probar relé de arranque y capacitor de arranque del compresor",
       "cluster_id": "compressor",
-      "source_url": "https://www.yoreparo.com/es/refrigeracion/refrigeradores/preguntas/831848/como-probar-un-capacitor-de-arranque"
+      "source_url": "https://www.yoreparo.com/es/refrigeracion/refrigeradores/preguntas/831848/como-probar-un-capacitor-de-arranque",
+      "why": [
+        "El compresor hace un 'clic' repetido pero no llega a arrancar.",
+        "Se sospecha relé de arranque o capacitor de arranque defectuoso."
+      ]
     },
     {
       "id": "inspectADCBoard",
       "label": "Inspeccionar tarjeta ADC (Adaptive Defrost Control)",
       "cluster_id": "electronics",
-      "source_url": "https://www.clubdediagramas.com/"
+      "source_url": "https://www.clubdediagramas.com/",
+      "why": [
+        "El ciclo de deshielo es errático o no sigue la lógica esperada pese a que sensor y resistencia funcionan bien.",
+        "Se sospecha falla puntual en el control adaptativo de deshielo (ADC)."
+      ]
     },
     {
       "id": "diagnoseIcemakerFault",
       "label": "Diagnosticar falla del fabricador de hielo",
       "cluster_id": "icemaker",
-      "source_url": "https://www.yoreparo.com/es/refrigeracion/refrigeradores/preguntas/5822508/fabricador-de-hielo-whirlpool-no-funciona"
+      "source_url": "https://www.yoreparo.com/es/refrigeracion/refrigeradores/preguntas/5822508/fabricador-de-hielo-whirlpool-no-funciona",
+      "why": [
+        "El fabricador de hielo no produce hielo, lo hace muy lento, o de forma irregular."
+      ]
     },
     {
       "id": "testIcemakerModule",
       "label": "Probar módulo, bimetal y válvula del fabricador de hielo",
       "cluster_id": "icemaker",
-      "source_url": "https://www.yoreparo.com/es/refrigeracion/refrigeradores/preguntas/1209994/fabricador-de-hielo-whirlpool-no-hace-hielo"
+      "source_url": "https://www.yoreparo.com/es/refrigeracion/refrigeradores/preguntas/1209994/fabricador-de-hielo-whirlpool-no-hace-hielo",
+      "why": [
+        "El fabricador de hielo llena de agua pero no congela, o congela pero no expulsa/desmolda el hielo."
+      ]
     }
   ]
 }
