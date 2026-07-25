@@ -63,6 +63,7 @@ def load_master_graph(
             node_id,
             label=node["label"],
             cluster_id=node.get("cluster_id"),
+            why=node.get("why") or [],
         )
 
     for edge in raw_edges:
