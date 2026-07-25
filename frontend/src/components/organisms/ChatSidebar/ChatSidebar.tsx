@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Icon } from '@/components/atoms';
 import { ChatMessage } from '@/components/molecules';
 import type { ChatMessageData } from '@/types';
@@ -10,14 +10,30 @@ interface ChatSidebarProps {
   messages: ChatMessageData[];
   open: boolean;
   onToggle: () => void;
+  onSendMessage?: (text: string) => void;
 }
 
-const ChatSidebar = ({ messages, open, onToggle }: ChatSidebarProps) => {
+const ChatSidebar = ({ messages, open, onToggle, onSendMessage }: ChatSidebarProps) => {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const [input, setInput] = useState('');
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  const handleSend = () => {
+    const text = input.trim();
+    if (!text || !onSendMessage) return;
+    onSendMessage(text);
+    setInput('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
   return (
     <>
@@ -52,10 +68,16 @@ const ChatSidebar = ({ messages, open, onToggle }: ChatSidebarProps) => {
           <input
             className="chat-sidebar__input"
             type="text"
-            placeholder="Escribe un mensaje..."
-            disabled
+            placeholder="Describe el problema técnico..."
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
-          <button className="chat-sidebar__send" disabled>
+          <button
+            className="chat-sidebar__send"
+            disabled={!input.trim()}
+            onClick={handleSend}
+          >
             <Icon name="send" size={16} />
           </button>
         </div>

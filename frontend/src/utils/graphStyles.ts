@@ -12,6 +12,16 @@ export const getNodeColor = (tipo: string, theme: ThemeName = 'dark'): string =>
   }
 };
 
+export const getHighlightNodeColor = (tipo: string, theme: ThemeName = 'dark'): string => {
+  const p = THEME[theme].node;
+  switch (tipo) {
+    case NODE_TYPES.ACCION: return '#60b0ff';
+    case NODE_TYPES.ESTADO: return '#ffa040';
+    case NODE_TYPES.INFORMACION: return '#d0d0d0';
+    default: return p.default;
+  }
+};
+
 export const getBadgeClass = (tipo: string): string => {
   switch (tipo) {
     case NODE_TYPES.ACCION: return 'badge-accion';

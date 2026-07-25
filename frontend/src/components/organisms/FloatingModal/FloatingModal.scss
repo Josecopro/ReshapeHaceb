@@ -71,6 +71,36 @@
       transform: rotate(90deg);
     }
   }
+
+  &__actions {
+    padding: 0 1.5rem 1.25rem;
+  }
+
+  &__ask-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.625rem 1rem;
+    border-radius: 0.625rem;
+    border: 1px solid var(--g-accent);
+    background: color-mix(in srgb, var(--g-accent) 12%, transparent);
+    color: var(--g-accent);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: -0.01em;
+
+    &:hover {
+      background: color-mix(in srgb, var(--g-accent) 22%, transparent);
+      box-shadow: 0 0 16px var(--g-accent-glow);
+    }
+
+    &:active {
+      transform: scale(0.97);
+    }
+  }
 }
 
 @keyframes modal-spring {

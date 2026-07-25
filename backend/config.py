@@ -6,16 +6,8 @@ sensibles hardcodeados aquí -- todo viene de variables de entorno.
 """
 
 import os
+from pathlib import Path
 
-from dotenv import load_dotenv
-
-# Carga el .env ANTES de leer cualquier os.environ.get de abajo. Sin esto,
-# las variables definidas en .env nunca llegan al proceso: os.environ.get
-# solo ve variables realmente exportadas en la shell, no las de un archivo
-# .env que nadie cargó explícitamente.
-load_dotenv()
-
-# --- Groq ---
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
 # Modelo SLM usado exclusivamente para la extracción prompt -> subgrafo.
@@ -31,16 +23,13 @@ SLM_EXTRACTION_MODEL = os.environ.get("SLM_EXTRACTION_MODEL", "openai/gpt-oss-20
 # configuración de modelos en distintos archivos.
 LLM_RESPONSE_MODEL = os.environ.get("LLM_RESPONSE_MODEL", "llama-3.3-70b-versatile")
 
-# --- CORS (front en Vercel, backend en host aparte: Render/Railway/Fly) ---
-ALLOWED_ORIGINS = [
-    origin.strip()
-    for origin in os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
-    if origin.strip()
-]
+# --- Límites de exploración topológica ---
+MAX_EXPLORATION_DEPTH = int(os.environ.get("MAX_EXPLORATION_DEPTH", "4"))
 
-# --- Límites de exploración topológica (usado más adelante en core/topology.py) ---
-MAX_EXPLORATION_DEPTH = int(os.environ.get("MAX_EXPLORATION_DEPTH", "8"))  # D_max
+# Resolve paths relative to this file's location (backend/)
+_BACKEND_DIR = Path(__file__).resolve().parent
+_DEFAULT_NODES = str(_BACKEND_DIR.parent / "db" / "nodes.json")
+_DEFAULT_EDGES = str(_BACKEND_DIR.parent / "db" / "edges.json")
 
-# --- Grafo maestro (G_db) ---
-GRAPH_DB_NODES_PATH = os.environ.get("GRAPH_DB_NODES_PATH", "./data/nodes.json")
-GRAPH_DB_EDGES_PATH = os.environ.get("GRAPH_DB_EDGES_PATH", "./data/edges.json")
+GRAPH_DB_NODES_PATH = os.environ.get("GRAPH_DB_NODES_PATH", _DEFAULT_NODES)
+GRAPH_DB_EDGES_PATH = os.environ.get("GRAPH_DB_EDGES_PATH", _DEFAULT_EDGES)

@@ -73,6 +73,11 @@ def load_master_graph(
         else raw_edges_content
     )
 
+    if isinstance(raw_nodes, dict):
+        raw_nodes = raw_nodes.get("nodes", raw_nodes)
+    if isinstance(raw_edges, dict):
+        raw_edges = raw_edges.get("edges", raw_edges)
+
     graph = nx.DiGraph()
 
     seen_ids: set[str] = set()
@@ -85,6 +90,7 @@ def load_master_graph(
             node_id,
             label=node["label"],
             cluster_id=node.get("cluster_id"),
+            source_url=node.get("source_url") or "",
             why=node.get("why") or [],
             source_url=node.get("source_url"),
         )
