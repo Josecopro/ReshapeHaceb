@@ -1,0 +1,66 @@
+.legend {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  display: flex;
+  gap: 1rem;
+  z-index: 10;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--g-text-muted);
+    animation: legend-enter 0.3s ease-out both;
+    transition: color 0.3s ease;
+
+    &:hover .legend__swatch {
+      transform: scaleX(1.3);
+    }
+  }
+
+  &__swatch {
+    width: 14px;
+    height: 3px;
+    border-radius: 2px;
+    transition: transform 0.2s ease;
+
+    &--dashed {
+      width: 18px;
+      height: 0;
+      border-top: 2.5px dashed;
+      border-radius: 0;
+      background: none !important;
+    }
+
+    &--pulse {
+      animation: legend-pulse 2.5s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes legend-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes legend-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+    box-shadow: 0 0 0 transparent;
+  }
+
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 8px color-mix(in srgb, var(--g-accent) 40%, transparent);
+  }
+}

@@ -1,0 +1,67 @@
+// ─── Theme Variables (Starlight palette) ─────────────
+.graph-container {
+  --g-bg: #000;
+  --g-canvas: #1f1f1f;
+  --g-surface: #3d3d3d;
+  --g-text: #fff;
+  --g-text-muted: #999;
+  --g-border: #5c5c5c;
+  --g-accent: #28bc37;
+  --g-accent-glow: rgba(40, 188, 55, 0.3);
+  --g-badge-accion-bg: rgba(57, 147, 244, 0.15);
+  --g-badge-accion-border: rgba(57, 147, 244, 0.3);
+  --g-badge-accion-text: #79bcfb;
+  --g-badge-estado-bg: rgba(247, 134, 18, 0.15);
+  --g-badge-estado-border: rgba(247, 134, 18, 0.3);
+  --g-badge-estado-text: #febc64;
+  --g-badge-default-bg: rgba(173, 173, 173, 0.15);
+  --g-badge-default-border: rgba(173, 173, 173, 0.3);
+  --g-badge-default-text: #d6d6d6;
+  --g-overlay: rgba(0, 0, 0, 0.6);
+
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--g-canvas);
+  transition: background 0.3s ease, color 0.3s ease;
+
+  // ── Light theme overrides ──
+  &[data-theme="light"] {
+    --g-bg: #fff;
+    --g-canvas: #f5f5f5;
+    --g-surface: #fff;
+    --g-text: #1f1f1f;
+    --g-text-muted: #858585;
+    --g-border: #e0e0e0;
+    --g-accent: #08a822;
+    --g-accent-glow: rgba(8, 168, 34, 0.25);
+    --g-badge-accion-bg: rgba(21, 123, 244, 0.1);
+    --g-badge-accion-border: rgba(21, 123, 244, 0.25);
+    --g-badge-accion-text: #157bf4;
+    --g-badge-estado-bg: rgba(229, 112, 1, 0.1);
+    --g-badge-estado-border: rgba(229, 112, 1, 0.25);
+    --g-badge-estado-text: #e57001;
+    --g-badge-default-bg: rgba(112, 112, 112, 0.1);
+    --g-badge-default-border: rgba(112, 112, 112, 0.25);
+    --g-badge-default-text: #707070;
+    --g-overlay: rgba(255, 255, 255, 0.6);
+  }
+
+  // ── Main graph area ──
+  &__main {
+    position: absolute;
+    inset: 0;
+    transition: right 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    &--shifted {
+      right: 380px;
+    }
+  }
+}
+
+// ─── Responsive ───────────────────────────────────────
+@media (max-width: 768px) {
+  .graph-container__main--shifted {
+    right: 0;
+  }
+}

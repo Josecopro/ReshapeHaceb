@@ -1,0 +1,1 @@
+export { GraphViewTemplate } from './GraphViewTemplate';

@@ -1,14 +1,6 @@
-import { THEME, NODE_TYPES } from '../constants/edgeConfig';
-import type { ThemeName } from '../constants/edgeConfig';
-
-export interface GraphLink {
-  source: string;
-  target: string;
-  tipo_relacion: string;
-  peso: number;
-  condicion: string;
-  es_bifurcacion_critica: boolean;
-}
+import { THEME, NODE_TYPES } from '@/constants/edgeConfig';
+import type { ThemeName } from '@/constants/edgeConfig';
+import type { GraphLink } from '@/types';
 
 export const getNodeColor = (tipo: string, theme: ThemeName = 'dark'): string => {
   const p = THEME[theme].node;

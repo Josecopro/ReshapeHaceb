@@ -1,0 +1,38 @@
+.modal-field {
+  padding: 0 1.5rem 1.25rem;
+  animation: field-slide 0.3s ease-out both;
+
+  &:first-of-type {
+    padding-top: 1.25rem;
+  }
+
+  &__label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--g-text-muted);
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: color 0.3s ease;
+  }
+
+  &__value {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--g-text);
+    transition: color 0.3s ease;
+  }
+}
+
+@keyframes field-slide {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

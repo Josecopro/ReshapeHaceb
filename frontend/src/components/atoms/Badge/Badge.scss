@@ -1,0 +1,29 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.375rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+
+  &-accion {
+    background: var(--g-badge-accion-bg);
+    border: 1px solid var(--g-badge-accion-border);
+    color: var(--g-badge-accion-text);
+  }
+
+  &-estado {
+    background: var(--g-badge-estado-bg);
+    border: 1px solid var(--g-badge-estado-border);
+    color: var(--g-badge-estado-text);
+  }
+
+  &-default {
+    background: var(--g-badge-default-bg);
+    border: 1px solid var(--g-badge-default-border);
+    color: var(--g-badge-default-text);
+  }
+}

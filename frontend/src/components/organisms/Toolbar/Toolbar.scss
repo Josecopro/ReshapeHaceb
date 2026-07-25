@@ -1,0 +1,100 @@
+.toolbar {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 10;
+  display: flex;
+  gap: 0.5rem;
+  animation: toolbar-enter 0.4s ease-out both;
+
+  &__btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--g-surface);
+    border: 1px solid var(--g-border);
+    border-radius: 0.5rem;
+    color: var(--g-text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--g-accent-glow), transparent);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    &:hover {
+      border-color: var(--g-text-muted);
+      color: var(--g-text);
+      transform: translateY(-1px);
+
+      &::before {
+        opacity: 1;
+      }
+    }
+
+    &:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    &--icon {
+      padding: 0.5rem;
+    }
+
+    &--active {
+      background: color-mix(in srgb, var(--g-accent) 12%, transparent);
+      border-color: color-mix(in srgb, var(--g-accent) 50%, transparent);
+      color: var(--g-accent);
+      box-shadow: 0 0 20px var(--g-accent-glow);
+
+      .toolbar__dot {
+        background: var(--g-accent);
+        box-shadow: 0 0 6px var(--g-accent-glow);
+        opacity: 1;
+        animation: dot-pulse 2s ease-in-out infinite;
+      }
+    }
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--g-text-muted);
+    opacity: 0.4;
+    transition: all 0.3s ease;
+  }
+}
+
+@keyframes toolbar-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dot-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 6px var(--g-accent-glow);
+  }
+
+  50% {
+    box-shadow: 0 0 12px color-mix(in srgb, var(--g-accent-glow) 70%, transparent);
+  }
+}
