@@ -1,1 +1,8 @@
+
 .env
+.agents/
+.next/
+.venv/
+.claude/
+node_modules/
+
